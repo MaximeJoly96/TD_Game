@@ -1,18 +1,19 @@
 ﻿using UnityEngine;
 using TD_Game.Entities;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace TD_Game.Systems
 {
     public class GameManager : MonoBehaviour
     {
-        private TurretBehaviour[] _turrets;
+        private List<TurretBehaviour> _turrets;
 
         private void Awake()
         {
-            _turrets = FindObjectsOfType<TurretBehaviour>();
+            _turrets = FindObjectsOfType<TurretBehaviour>().ToList();
 
-            for (int i = 0; i < _turrets.Length; i++)
+            for (int i = 0; i < _turrets.Count; i++)
             {
                 _turrets[i].TurretDestroyed.AddListener(TurretHit);
             }
@@ -22,7 +23,7 @@ namespace TD_Game.Systems
         {
             if(Input.GetKeyDown(KeyCode.Space))
             {
-                for(int i = 0; i < _turrets.Length; i++)
+                for(int i = 0; i < _turrets.Count; i++)
                 {
                     _turrets[i].CreateProjectile();
                 }
@@ -31,13 +32,9 @@ namespace TD_Game.Systems
 
         private void TurretHit(GameObject turret)
         {
-            int i = 0;
-            for (i = 0; i < _turrets.Length && _turrets[i] != turret; i++) ;
+            _turrets.Remove(turret.GetComponent<TurretBehaviour>());
 
-            if (i < _turrets.Length)
-                _turrets[i] = null;
-
-            if (_turrets.Any(t => t != null))
+            if (_turrets.Count == 0)
                 Debug.Log("Game over");
         }
     }

@@ -9,6 +9,8 @@ namespace TD_Game.Entities
     {
         [SerializeField]
         private ProjectileBehaviour _projectilePrefab;
+        [SerializeField]
+        private Transform _canon;
 
         private TurretDestroyedEvent _turretDestroyed;
         public TurretDestroyedEvent TurretDestroyed
@@ -25,9 +27,7 @@ namespace TD_Game.Entities
         public void CreateProjectile()
         {
             ProjectileBehaviour proj = Instantiate(_projectilePrefab, transform);
-            Plane plane = new Plane(transform.position, new Vector3(1.0f, transform.position.y, 1.0f), new Vector3(-1.0f, transform.position.y, -1.0f));
-            Vector3 targetPosition = CameraExtensions.ScreenPointToWorld(Input.mousePosition, plane, Camera.main);
-            proj.Init(targetPosition);
+            proj.Init(CursorUtils.MousePositionToWorld(transform.position));
         }
 
         private void OnTriggerEnter(Collider other)
@@ -40,6 +40,13 @@ namespace TD_Game.Entities
                 Destroy(enemy.gameObject);
                 Destroy(gameObject);
             }  
+        }
+
+        private void Update()
+        {
+            Vector3 target = CursorUtils.MousePositionToWorld(transform.position);
+            target.y = transform.position.y;
+            transform.LookAt(target);
         }
     }
 }
